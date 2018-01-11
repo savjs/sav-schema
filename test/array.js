@@ -80,3 +80,43 @@ test('SchemaArray.delay', ava => {
     Users.checkThen([{id: 1}]).then(reached, (err) => console.log(err))
   })
 })
+
+test('SchemaArray.create', ava => {
+  {
+    let Users = schema.declare({
+      array: Number
+    })
+    let ret = Users.create([], {fillArray: true})
+    expect(ret).to.eql([0])
+  }
+  {
+    let Users = schema.declare({
+      array: {
+        props: {
+          id: Number
+        }
+      },
+      name: 'Users'
+    })
+    let ret = Users.create([], {fillArray: true})
+    expect(ret).to.eql([{id: 0}])
+
+    let Accounts = schema.declare({
+      props: {
+        users: 'Users',
+        somebody: {
+          props: {
+            users: 'Users'
+          }
+        }
+      }
+    })
+    ret = Accounts.create({}, {fillArray: true})
+    expect(ret).to.eql({
+      users: [{id: 0}],
+      somebody: {
+        users: [{id: 0}]
+      }
+    })
+  }
+})
